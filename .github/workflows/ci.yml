@@ -34,7 +34,7 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: ./cloud-security-backend
-        run: npm ci
+        run: npm run
 
       - name: Lint backend
         working-directory: ./cloud-security-backend
@@ -59,7 +59,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ./frontReact
-        run: npm ci
+        run: npm run
 
       - name: Lint frontend
         working-directory: ./frontReact
