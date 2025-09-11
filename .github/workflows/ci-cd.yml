@@ -108,4 +108,4 @@ jobs:
 
       - name: Deploy Docker images on Windows host
         run: |
-          ssh ASUS@192.168.0.84 "docker pull sarrarejeb01/cloud-backend:latest && docker pull sarrarejeb01/cloud-frontend:latest && docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d"
+          ssh asus@192.168.0.84 "docker pull sarrarejeb01/cloud-backend:latest && docker pull sarrarejeb01/cloud-frontend:latest && docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d"
