@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_URI: postgres://postgres:postgres@db:5432/cloud_security
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cloud_security
+    ports:
+      - "5432:5432"
