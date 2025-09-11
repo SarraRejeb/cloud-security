@@ -33,15 +33,15 @@ jobs:
           node-version: 18
 
       - name: Install backend dependencies
-        working-directory: ./backend
+        working-directory: ./cloud-security-backend
         run: npm ci
 
       - name: Lint backend
-        working-directory: ./backend
+        working-directory: ./cloud-security-backend
         run: npm run lint
 
       - name: Run backend tests
-        working-directory: ./backend
+        working-directory: ./cloud-security-backend
         env:
           POSTGRES_URI: postgres://postgres:postgres@localhost:5432/cloud_security_test
         run: npm test -- --forceExit --detectOpenHandles
@@ -58,13 +58,13 @@ jobs:
           node-version: 18
 
       - name: Install frontend dependencies
-        working-directory: ./frontend
+        working-directory: ./frontReact
         run: npm ci
 
       - name: Lint frontend
-        working-directory: ./frontend
+        working-directory: ./frontReact
         run: npm run lint
 
       - name: Run frontend tests
-        working-directory: ./frontend
+        working-directory: ./frontReact
         run: npm test -- --watchAll=false
