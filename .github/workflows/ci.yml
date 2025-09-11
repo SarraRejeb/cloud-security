@@ -44,7 +44,11 @@ jobs:
         working-directory: ./cloud-security-backend
         env:
           POSTGRES_URI: postgres://postgres:postgres@localhost:5432/cloud_security_test
-        run: npm test -- --watchAll=false --passWithNoTests
+          SENDGRID_API_KEY: "SG.fakeapikey123"
+          HF_TOKEN: "fake_token_for_tests"
+          OPENAI_API_KEY: "fake_openai_key"
+        run: npm test -- --forceExit --detectOpenHandles --watchAll=false --passWithNoTests
+
 
   frontend-tests:
     runs-on: ubuntu-latest
