@@ -95,25 +95,14 @@ jobs:
           docker push sarrarejeb01/cloud-frontend:latest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: docker-build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }} # clé privée si tu veux déployer par clé
-
       - name: Deploy Docker images on Windows host
-        env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }} # si tu veux utiliser mot de passe
         run: |
-          # Si tu utilises mot de passe, installe sshpass sur ubuntu runner :
-          sudo apt-get update && sudo apt-get install -y sshpass
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no asus@192.168.0.84 " \
-            docker pull sarrarejeb01/cloud-backend:latest && \
-            docker pull sarrarejeb01/cloud-frontend:latest && \
-            docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d && \
-            docker ps \
-          "
+          docker pull sarrarejeb01/cloud-backend:latest
+          docker pull sarrarejeb01/cloud-frontend:latest
+          docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d
+          docker ps
