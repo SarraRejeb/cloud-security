@@ -105,4 +105,4 @@ jobs:
           docker pull sarrarejeb01/cloud-backend:latest
           docker pull sarrarejeb01/cloud-frontend:latest
           docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d
-          docker ps
+          
