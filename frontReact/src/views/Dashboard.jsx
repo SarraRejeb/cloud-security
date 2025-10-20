@@ -129,7 +129,7 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://backend:5000/api/dashboard/data', {
+        const response = await fetch('http://localhost:5000/api/dashboard/data', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();

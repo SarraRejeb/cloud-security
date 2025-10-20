@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:  # permet un déclenchement manuel
 
 jobs:
   backend-tests:
@@ -105,4 +106,4 @@ jobs:
           docker pull sarrarejeb01/cloud-backend:latest
           docker pull sarrarejeb01/cloud-frontend:latest
           docker-compose -f C:/Users/ASUS/Downloads/cloud-security/docker-compose.yml up -d
-          
+          docker ps

@@ -11,7 +11,7 @@ export default function Quiz() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch('http://backend:5000/api/quiz/questions');
+        const response = await fetch('http://localhost:5000/api/quiz/questions');
         const data = await response.json();
         if (response.ok) {
           setQuestions(data);

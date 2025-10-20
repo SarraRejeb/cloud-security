@@ -12,7 +12,7 @@ const SecurityChatbot = () => {
     setInput("");
 
     try {
-      const res = await axios.post("http://backend:5000/api/chat", { prompt: input });
+      const res = await axios.post("http://localhost:5000/api/chat", { prompt: input });
       setMessages([...newMessages, { from: 'bot', text: res.data.response }]);
     } catch (err) {
       setMessages([...newMessages, { from: 'bot', text: "❌ Erreur de réponse du serveur." }]);

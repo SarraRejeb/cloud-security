@@ -128,23 +128,12 @@ function Header() {
             </Nav.Item>
           </Nav>
           <Nav className="ml-auto" navbar>
-            <Nav.Item>
-              <Nav.Link
-                className="m-0"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="no-icon">Account</span>
-              </Nav.Link>
-            </Nav.Item>
             
-
             <Nav.Item>
               <Nav.Link className="m-0" href="#logout" onClick={handleLogout}>
                 <span className="no-icon">Log out</span>
               </Nav.Link>
             </Nav.Item>
-
 
           </Nav>
         </Navbar.Collapse>
