@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: cloud_security
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - cloud-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  backend:
+    image: sarrarejeb01/cloud-backend:latest
+    depends_on:
+      - db
+    environment:
+      POSTGRES_URI: postgres://postgres:example@db:5432/cloud_security
+    ports:
+      - "5000:5000"
+    networks:
+      - cloud-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    image: sarrarejeb01/cloud-frontend:latest
+    ports:
+      - "3000:80"
+    networks:
+      - cloud-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  pgdata:
+
+networks:
+  cloud-net:
+    driver: overlay
