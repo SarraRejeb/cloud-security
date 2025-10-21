@@ -9,7 +9,7 @@ on:
 
 jobs:
   # ---------------------
-  # 1️⃣ TESTS BACKEND
+  # 🧪 1. TESTS BACKEND
   # ---------------------
   backend-tests:
     runs-on: ubuntu-latest
@@ -26,6 +26,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -48,7 +49,7 @@ jobs:
         run: npm test -- --forceExit --detectOpenHandles --watchAll=false --passWithNoTests
 
   # ---------------------
-  # 2️⃣ TESTS FRONTEND
+  # 🧪 2. TESTS FRONTEND
   # ---------------------
   frontend-tests:
     runs-on: ubuntu-latest
@@ -69,7 +70,7 @@ jobs:
         run: npm test -- --watchAll=false --passWithNoTests
 
   # ---------------------
-  # 3️⃣ BUILD & PUSH DOCKER IMAGES
+  # 🐳 3. BUILD & PUSH DOCKER IMAGES
   # ---------------------
   docker-build:
     runs-on: ubuntu-latest
@@ -91,48 +92,29 @@ jobs:
           docker push sarrarejeb01/cloud-frontend:latest
 
   # ---------------------
-  # 4️⃣ DEPLOY ON DOCKER SWARM (WSL / Remote)
+  # 🚀 4. DEPLOY ON WINDOWS SELF-HOSTED RUNNER
   # ---------------------
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: docker-build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Swarm via SSH
-        uses: appleboy/ssh-action@v0.1.9
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          host: 127.0.0.1          # IP de ta VM WSL
-          username: sarrarejeb
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd ~/cloud-security
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-            # Initialiser Swarm si nécessaire
-            if ! docker info | grep -q 'Swarm: active'; then
-              echo "Initializing Docker Swarm..."
-              docker swarm init
-            else
-              echo "Swarm already active"
-            fi
-
-            # Pull des dernières images
-            docker pull sarrarejeb01/cloud-backend:latest
-            docker pull sarrarejeb01/cloud-frontend:latest
-
-            # Supprimer ancienne stack si existante
-            if docker stack ls | grep -q cloud-security; then
-              echo "Removing existing stack..."
-              docker stack rm cloud-security
-              sleep 10
-            fi
-
-            # Déployer nouvelle stack
-            echo "Deploying new stack..."
-            docker stack deploy -c docker-compose.yml cloud-security
-
-            # Vérification des services
-            docker service ls
-            docker service logs cloud-security_backend --tail 10
-            docker service logs cloud-security_frontend --tail 10
+      - name: Deploy updated containers
+        run: |
+          echo "Pulling latest images..."
+          docker pull sarrarejeb01/cloud-backend:latest
+          docker pull sarrarejeb01/cloud-frontend:latest
+          
+          echo "Recreating containers with docker-compose..."
+          docker compose -f ./docker-compose.yml down
+          docker compose -f ./docker-compose.yml up -d --build
+          
+          echo "Running containers:"
+          docker ps
