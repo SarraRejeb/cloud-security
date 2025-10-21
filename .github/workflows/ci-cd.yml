@@ -89,53 +89,41 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker-build
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Deploy via SSH to Swarm
+      - uses: actions/checkout@v4
+      - name: Deploy to Swarm via SSH
         uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.SSH_SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
+          host: 127.0.0.1                 
+          username: sarrarejeb              
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Aller dans le dossier du projet
             cd ~/cloud-security
 
-            echo "Pulling latest images..."
+            # Vérifier si Swarm est actif, sinon initialiser
+            if ! docker info | grep -q 'Swarm: active'; then
+              echo "Initializing Docker Swarm..."
+              docker swarm init
+            else
+              echo "Swarm already active"
+            fi
+
+            # Pull des images
             docker pull sarrarejeb01/cloud-backend:latest
             docker pull sarrarejeb01/cloud-frontend:latest
 
-            # Supprimer l’ancienne stack si elle existe
+            # Supprimer ancienne stack si existante
             if docker stack ls | grep -q cloud-security; then
               echo "Removing existing stack..."
               docker stack rm cloud-security
-              sleep 15
+              sleep 10
             fi
 
-            # Supprimer containers orphelins
-            orphan_containers=$(docker ps -a -q --filter "name=cloud-security")
-            if [ ! -z "$orphan_containers" ]; then
-              echo "Removing orphan containers..."
-              docker rm -f $orphan_containers
-            fi
+            # Déployer nouvelle stack
+            echo "Deploying new stack..."
+            docker stack deploy -c docker-compose.yml cloud-security
 
-            # Supprimer réseaux overlay inutilisés
-            unused_networks=$(docker network ls -q --filter "name=cloud-security" --filter "dangling=true")
-            if [ ! -z "$unused_networks" ]; then
-              echo "Removing unused networks..."
-              docker network rm $unused_networks
-            fi
-
-            # Supprimer volumes orphelins
-            orphan_volumes=$(docker volume ls -q --filter "dangling=true")
-            if [ ! -z "$orphan_volumes" ]; then
-              echo "Removing orphan volumes..."
-              docker volume rm $orphan_volumes
-            fi
-
-            echo "Deploying stack..."
-            docker stack deploy -c docker-compose-swarm.yml cloud-security
-
-            echo "Checking services..."
+            # Vérification des services
             docker service ls
             docker service logs cloud-security_backend --tail 10
             docker service logs cloud-security_frontend --tail 10
