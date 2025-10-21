@@ -86,44 +86,28 @@ jobs:
   # 4️⃣ DEPLOY ON DOCKER SWARM
   # ---------------------
   deploy:
-    runs-on: ubuntu-latest
-    needs: docker-build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Swarm via SSH
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: 127.0.0.1                 
-          username: sarrarejeb              
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            # Aller dans le dossier du projet
-            cd ~/cloud-security
+  runs-on: ubuntu-latest
+  needs: docker-build
+  steps:
+    - uses: actions/checkout@v4
 
-            # Vérifier si Swarm est actif, sinon initialiser
-            if ! docker info | grep -q 'Swarm: active'; then
-              echo "Initializing Docker Swarm..."
-              docker swarm init
-            else
-              echo "Swarm already active"
-            fi
-
-            # Pull des images
-            docker pull sarrarejeb01/cloud-backend:latest
-            docker pull sarrarejeb01/cloud-frontend:latest
-
-            # Supprimer ancienne stack si existante
-            if docker stack ls | grep -q cloud-security; then
-              echo "Removing existing stack..."
-              docker stack rm cloud-security
-              sleep 10
-            fi
-
-            # Déployer nouvelle stack
-            echo "Deploying new stack..."
-            docker stack deploy -c docker-compose.yml cloud-security
-
-            # Vérification des services
-            docker service ls
-            docker service logs cloud-security_backend --tail 10
-            docker service logs cloud-security_frontend --tail 10
+    - name: Deploy to Swarm via SSH
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: 127.0.0.1           
+        username: sarrarejeb
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ~/cloud-security
+          if ! docker info | grep -q 'Swarm: active'; then
+            docker swarm init
+          fi
+          docker pull sarrarejeb01/cloud-backend:latest
+          docker pull sarrarejeb01/cloud-frontend:latest
+          if docker stack ls | grep -q cloud-security; then
+            docker stack rm cloud-security
+            sleep 10
+          fi
+          docker stack deploy -c docker-compose.yml cloud-security
+          docker service ls
